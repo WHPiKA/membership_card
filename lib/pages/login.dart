@@ -339,10 +339,12 @@ class LoginPageState extends State<LoginPage> {
                   Map<String, dynamic> u = json.decode(res1.data);
                   user = User.fromJson(u);
                   user.account = _username;
+                  print(user.userId);
 
                   dioGetAllCards(dio, user.userId).then((res2) async {
                     if (res2.statusCode == 200) {
                       List<dynamic> js = res2.data;
+                      print(js);
                       List<CardInfo> list = CardCounter.fromJson(js).cardList;
                       Provider.of<CardCounter>(context).cardList = list;
                       print("get cards succeed");

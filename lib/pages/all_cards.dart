@@ -752,7 +752,7 @@ class _AllCardsPageState extends State<AllCardsPage>
                   margin: EdgeInsets.all(16.0),
                   alignment: Alignment(-1, 0.6),
                   child: Text(
-                      "${counter.getOneCard(index).discountTimes - counter.getOneCard(index).currentScore % counter.getOneCard(index).discountTimes} "
+                      "${(counter.getOneCard(index).discountTimes - counter.getOneCard(index).useTimes)}"
                       "More to go",
                       style: TextStyle(
                           fontSize: 18.0,
@@ -764,7 +764,7 @@ class _AllCardsPageState extends State<AllCardsPage>
                   padding: EdgeInsets.only(
                       left: 16.0, right: 16.0, top: 125.0, bottom: 2.0),
                   scrollDirection: Axis.horizontal,
-                  children: _buildRewardPlace(counter.getOneCard(index).currentScore % counter.getOneCard(index).discountTimes, rewardMaxPoint, context),
+                  children: _buildRewardPlace(counter.getOneCard(index).useTimes, rewardMaxPoint, context),
                 ),
               )
             ],
@@ -982,7 +982,7 @@ class _AllCardsPageState extends State<AllCardsPage>
   _getCardDesignByType(String cardType) {
     CardDesign design;
     switch (cardType) {
-      case "Integral":
+      case "Integrate":
         design = CardDesign.membership;
         break;
       case "Recharge":

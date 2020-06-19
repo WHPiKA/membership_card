@@ -135,6 +135,7 @@ class AddCardWithNumberPageState extends State<AddCardWithNumberPage>
                   //print("Save cookies successly");
                   Navigator.of(context).pushNamedAndRemoveUntil(
                       "/allCardsPage", (route) => route == null);
+                  print(res.data);
                   Map<String, dynamic> card = json.decode(res.data);
                   counter.addCard(CardInfo.fromJson(card));
                   print(res.statusCode);
