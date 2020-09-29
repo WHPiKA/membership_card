@@ -200,6 +200,7 @@ class CouponPageState extends State<CouponPage> with SingleTickerProviderStateMi
                                         ModalRoute.withName(
                                             "/cardinfo_membership"));
                                   } else {
+                                    print(res.statusCode);
                                     showDialog(
                                         context: context,
                                         builder: (_) => AlertDialog(

@@ -1,5 +1,8 @@
 import 'package:flutter/cupertino.dart';
 
+///This is the model of activity.
+///Each static definition should correspond to
+///the name in the json file from the backend
 class ActivityInfo extends ChangeNotifier {
   static const String ID_JSON = "TypeId";
   static const String TYPE_JSON = "CardType";
@@ -24,6 +27,7 @@ class ActivityInfo extends ChangeNotifier {
 
 
   int get activityId => _typeId;
+  int get typeId => _typeId;
   String get type => _type;
   String get enterprise => _enterprise;
   String get state => _state;
@@ -32,8 +36,6 @@ class ActivityInfo extends ChangeNotifier {
   String get description => _description;
   String get expireTime => _expireTime;
   String get backgroundbase64=> _backgroundbase64;
-
-      int get typeId => _typeId;
 
   set typeId(int value) {
     _typeId = value;

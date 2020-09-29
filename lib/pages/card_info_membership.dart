@@ -45,30 +45,30 @@ class CardInfo1State extends State<CardInfo1Page> {
   Widget build(BuildContext context) {
     dynamic args = ModalRoute.of(context).settings.arguments;
     CardInfo card = Provider.of<CardCounter>(context,listen:false).getCard(args["card"]);
-    int itemNum = card.couponsNum + 3;
+    int itemNum = card.couponsNum * 2 + 3;
 
-    List<EnterpriseInfo> list = Provider.of<EnterpriseCounter>(context).enterpriseList;
-    String back_CaptchaCode;
-    for(int i = 0; i < list.length; i++){
-      if(list[i].enterpriseName == card.eName){
-
-        String enterpriseId = list[i].enterpriseId;
-
-        dioGetEnterpriseInfo(dio, enterpriseId).then((res) async{
-          print(res.statusCode);
-          print(res.data);
-          if(res.statusCode==200){
-            Map<String, dynamic> js = res.data;
-            back_CaptchaCode = EnterpriseDemo.fromJson(js).base64;
-          }
-        }
-        );
-        break;
-      }
-    }
-    //商家店面背景
-    back_CaptchaCode = back_CaptchaCode.split(',')[1];
-    Uint8List bytes = Base64Decoder().convert(back_CaptchaCode);
+//    List<EnterpriseInfo> list = Provider.of<EnterpriseCounter>(context).enterpriseList;
+//    String back_CaptchaCode;
+//    for(int i = 0; i < list.length; i++){
+//      if(list[i].enterpriseName == card.eName){
+//
+//        String enterpriseId = list[i].enterpriseId;
+//
+//        dioGetEnterpriseInfo(dio, enterpriseId).then((res) async{
+//          print(res.statusCode);
+//          print(res.data);
+//          if(res.statusCode==200){
+//            Map<String, dynamic> js = res.data;
+//            back_CaptchaCode = EnterpriseDemo.fromJson(js).base64;
+//          }
+//        }
+//        );
+//        break;
+//      }
+//    }
+//    //商家店面背景
+//    back_CaptchaCode = back_CaptchaCode.split(',')[1];
+//    Uint8List bytes = Base64Decoder().convert(back_CaptchaCode);
 
     return Scaffold(
         backgroundColor: Colors.white,
@@ -122,7 +122,6 @@ class CardInfo1State extends State<CardInfo1Page> {
                   ),
                 ],
               ),
-
               SliverPadding(
                 padding: EdgeInsets.symmetric(horizontal: 0),
                 sliver: SliverList(
@@ -132,19 +131,17 @@ class CardInfo1State extends State<CardInfo1Page> {
                       if(index < itemNum){
                         try{
                           if (index == 0) {
-                            if(bytes!=null){
-                              return Image.memory(bytes, fit: BoxFit.fitWidth,);
-                            }
-                            else{
-                              return Image.asset("assets/backgrounds/starbucksBackground.jpg");
-                            }
-//                            return Image(
-//                              image: MemoryImage(bytes),   //card.background
-//                              //height: 300,
-//                              fit: BoxFit.fitWidth,
-//                            );
+                            print(index);
+//                            if(bytes!=null){
+//                              return Image.memory(bytes, fit: BoxFit.fitWidth,);
+//                            }
+//                            else{
+//                              return Image.asset("assets/backgrounds/starbucksBackground.jpg");
+//                            }
+                            return Image.asset("assets/backgrounds/starbucksBackground.jpg", fit: BoxFit.fitWidth,);
                           }
                           if(index == 1){
+                            print(index);
                             return  Text(
                               " City: " + card.city + "\n" +
 //                              " City: "  "\n" +
@@ -158,6 +155,7 @@ class CardInfo1State extends State<CardInfo1Page> {
                             );
                           }
                           if(index == 2){
+                            print(index);
                             return Container(
                               decoration: BoxDecoration(
                                   color: card.cardColor,
@@ -198,12 +196,14 @@ class CardInfo1State extends State<CardInfo1Page> {
                                           style: TextStyle(
                                             fontSize: 14.0,
                                             color: Colors.white,
-                                          ))),
+                                          )
+                                      )
+                                  ),
                                   Container(
                                       margin: EdgeInsets.all(20.0),
                                       alignment: Alignment(-1, 0.6),
                                       child: Text(
-                                          "${card.currentScore % card.discountTimes} "
+                                          "${card.discountTimes - (card.useTimes % card.discountTimes)} "
                                               "More to go",
                                           style: TextStyle(
                                               fontSize: 18.0,
@@ -215,14 +215,15 @@ class CardInfo1State extends State<CardInfo1Page> {
                                       padding: EdgeInsets.only(
                                           left: 20.0, right: 20.0, top: 125.0, bottom: 2.0),
                                       scrollDirection: Axis.horizontal,
-                                      children: _buildRewardPlace(card.currentScore % card.discountTimes , card.discountTimes, context),
+                                      children: _buildRewardPlace(card.useTimes % card.discountTimes , card.discountTimes, context),
                                     ),
                                   )
                                 ],
                               ),
                             );
                           }
-                          else if ((index-3) % 2 == 0) {
+                          else if ((index - 3) % 2 == 0) {
+                            print(index);
                             return GestureDetector(
                               child: Stack(
                                 children: <Widget>[
@@ -295,7 +296,7 @@ class CardInfo1State extends State<CardInfo1Page> {
                                             const EdgeInsets.symmetric(vertical: 20.0),
                                           ),
                                           Text(
-                                            "Offer expires at" + args["expireTime"],
+                                            "Offer expires at",
                                             style: TextStyle(
                                               color: Colors.grey,
                                               fontSize: 10,
@@ -309,9 +310,10 @@ class CardInfo1State extends State<CardInfo1Page> {
                                 ],
                               ),
                               onTap: (){
-                                Navigator.pushNamed(context, "/couponpage",  arguments: {
+                                Navigator.pushNamed(context, "/couponpage", arguments: {
                                   "card": card,
                                   "coupon": _buildCouponWithColor(context, index),
+                                }).then((data){
                                 });
                               },
                             ) ;
@@ -322,14 +324,19 @@ class CardInfo1State extends State<CardInfo1Page> {
                             );
                           }
                         }on Exception{
-                          return Image.asset("assets/backgrounds/starbucksBackground.jpg");
+//                          return Image(
+//                            image: AssetImage("assets/backgrounds/starbucksBackground.jpg"),   //card.background
+//                            //height: 300,
+//                            fit: BoxFit.fitWidth,
+//                          );
+                        return Container();
                         }
                       }
                       else{
                         return null;
                       }
                     },
-                    //childCount: itemNum,
+                    childCount: itemNum,
                   ),
                 ),
               ),

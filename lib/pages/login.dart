@@ -331,7 +331,7 @@ class LoginPageState extends State<LoginPage> {
                 try {
                   List<Cookie> cookies = (await Api.cookieJar).loadForRequest(
                       Uri.parse(dio.options.baseUrl + "/v1/api/user/login"));
-                  print("Load cookies successly");
+                  print("Load cookies successfully");
 
                   setState(() {
                     _isSent = false;

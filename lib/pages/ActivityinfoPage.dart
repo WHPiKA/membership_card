@@ -80,7 +80,7 @@ class ActivityinfoState extends State<ActivityinfoPage> {
         isThreeLine: true,
         dense: false,
         leading: new CircleAvatar(child: new Text(i.toString())),
-        title: new Text('卡片类型'),
+        title: new Text(args['type']),
         subtitle: new Text(item.description),
         trailing: new Icon(Icons.arrow_right, color: Colors.green),
         onTap: () {

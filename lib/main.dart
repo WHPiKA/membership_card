@@ -41,7 +41,7 @@ void main() {
 /// This is the entrance of our GoWallet App.
 /// It is used for entering the whole GoWallet App and
 ///  all the routes are set here.
-/// Maybe in the future we need to do the state management here.
+/// Maybe in the future we need to do the state management here
 ///  if the state changed so quickly that we have to do the
 ///  global state management
 class GoWallet extends StatelessWidget {
@@ -89,13 +89,11 @@ class GoWallet extends StatelessWidget {
               CardInfo card = Provider.of<CardCounter>(context,listen:false).getCard(args["card"]);
               return EditCardPage(card.cardId, card.eName);
             },
-
             "/bottomMenu": (_) => BottomMenuPage(),
             "/changePasswordPage": (BuildContext context){
               dynamic args = ModalRoute.of(context).settings.arguments;
               User user=args["user"];
               return ChangePasswordPage(user);},
-
             "/findpasswordpage":(_)=>FindPasswordPage(),
             "/discountDetail":(_)=> discountDetailPage(),
             "/activityListPage":(_) =>SwiperPage(),

@@ -1,7 +1,10 @@
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:membership_card/model/user_model.dart';
 
-///数据库相关的工具
+///This is used to save the account to the local disk
+///and to read the data from the local file to the memory.
+///Should only be used in login module.
+//Todo: Add enciphering function
 class SharedPreferenceUtil {
   static const String ACCOUNT_NUMBER = "account_number";
   static const String USERNAME = "username";

@@ -9,7 +9,7 @@ import 'package:cookie_jar/cookie_jar.dart';
 import 'package:dio_cookie_manager/dio_cookie_manager.dart';
 import 'package:membership_card/network/cookie.dart';
 
-const SERVER_URL = "http://106.15.198.136";
+const SERVER_URL = "http://uestczyj.com:8080";
 const PORT       = "8080";
 
 
@@ -17,7 +17,7 @@ Dio initDio() {
   Dio dio = Dio(
     // This is the base options for Dio client to connect to server
     BaseOptions(
-      baseUrl: "http://106.15.198.136:8080",
+      baseUrl: SERVER_URL,
       connectTimeout: 3000,
       receiveTimeout: 3000,
       receiveDataWhenStatusError: false,
@@ -34,7 +34,6 @@ Future<Response<T>> dioGetAllCards<T>(Dio dio, String userId) async {
   try {
     String url = "/v1/api/user/" + userId;
     res = await dio.get(url);
-
     return res;
   } on DioError catch (e) {
     if (e.response == null) {
@@ -268,20 +267,18 @@ Future<Response<T>> dioModify<T>(Dio dio,String cardId,String eName,String oldId
 }
 
 Future<Response<T>> dioUseCoupon<T>(Dio dio, String cardId, int increment) async{
-  var res = Response();
-  Map data = {
-    "increment": increment
+  dio.interceptors.add(CookieManager(await Api.cookieJar));
+
+  Response res = Response();
+  Map<String, dynamic> toJson() => {
+    "value": increment
   };
 
   try {
+    print(cardId);
     res = await dio.post(
-        "/v1/api/user/card/:id/coupons",
-        queryParameters: {
-          "id": cardId,
-        },
-        data: {
-          jsonEncode({"increment": increment}),
-        }
+        "/v1/api/user/card/$cardId/coupons",
+        data: jsonEncode(toJson())
     );
     return res;
   } on DioError catch (e) {

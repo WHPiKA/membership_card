@@ -157,7 +157,6 @@ class CardInfo extends ChangeNotifier{
 
     void redeemCoupon() {
       this._couponsNum--;
-      notifyListeners();
     }
 
     CardInfo([this._cardId, this._eName]);
@@ -180,8 +179,10 @@ class CardInfo extends ChangeNotifier{
       this._money = json[MONEY_JSON];
       this._serialNum = json[SERIAL_NUM_JSON];
       this._state = json[STATE_JSON];
+
       this._startTime = json[START_TIME_JSON];
       this._useTimes = json[USE_TIMES_JSON];
+
       this._discountTimes = json[DISCOUNT_TIMES_JSON];
       this._typeId = json[TYPE_ID_JSON];
     }
