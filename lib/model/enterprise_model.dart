@@ -11,6 +11,7 @@ class EnterpriseInfo extends ChangeNotifier{
   static const String WEBSITE_JSON           = "Website";
   static const String LICENSE_ID_JSON        = "LicenseId";
   static const String CONTACT_NUM_JSON       = "ContactNum";
+  static const String BACK_BASE64_JSON       = "base64";
 
   String _enterpriseId;
   String _addr;
@@ -22,7 +23,9 @@ class EnterpriseInfo extends ChangeNotifier{
   String _contactNum;
   int _registerNum;
   bool _isLocal;
+  String _base64;
 
+  String get base64 => _base64;
   String get enterpriseId => _enterpriseId;
   String get addr => _addr;
   String get type => _type;
@@ -43,6 +46,10 @@ class EnterpriseInfo extends ChangeNotifier{
     _enterpriseName = value;
     notifyListeners();
   }
+  set base64(String value) {
+    _base64 = value;
+    notifyListeners();
+  }
 
   EnterpriseInfo.fromJSON(Map<String, dynamic> json){
     _enterpriseName = json[ENTERPRISE_NAME_JSON];
@@ -54,6 +61,7 @@ class EnterpriseInfo extends ChangeNotifier{
     _helpMsg = json[HELP_MESSAGE_JSON];
     _website = json[WEBSITE_JSON];
     _licenseId = json[LICENSE_ID_JSON];
+    _base64 = json[BACK_BASE64_JSON];
   }
 
   EnterpriseInfo.fromCOUNTER(
@@ -67,22 +75,4 @@ class EnterpriseInfo extends ChangeNotifier{
         this._website,
         this._licenseId]);
 
-}
-
-class EnterpriseDemo{
-//  static const String BACK_BASE64_JSON = "base64";
-
-  EnterpriseInfo _eInfo;
-  String _base64;
-
-  String get base64 => _base64;
-
-  set base64(String value) {
-    _base64 = value;
-  }
-
-  EnterpriseDemo.fromJson(Map<String, dynamic> parsedJson){
-    _base64 = parsedJson["base64"];
-    _eInfo = EnterpriseInfo.fromJSON(parsedJson['enterprise']);
-  }
 }

@@ -124,7 +124,7 @@ class discountDetailPageState extends State<discountDetailPage> {
                     child: Column(
                       children: <Widget>[
                         Image(
-                          image: AssetImage(
+                          image: args["BackgroundBase64"]??AssetImage(
                               "assets/backgrounds/starbucksBackground.jpg"),
                           //card.background
                           //height: 300,

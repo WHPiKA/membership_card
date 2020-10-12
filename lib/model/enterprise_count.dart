@@ -21,7 +21,7 @@ class EnterpriseCounter extends ChangeNotifier {
       Map<String, dynamic> data = list[i];
       _enterpriseList.add(
           EnterpriseInfo.fromCOUNTER(
-              data["ID"],
+              data["Id"],
               data["Addr"],
               data["IsLocal"],
               data["Type"],

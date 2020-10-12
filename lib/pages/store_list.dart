@@ -46,16 +46,6 @@ class SwiperPageState extends State<SwiperPage> {
    'https://www.mcdonalds.com.cn'
  ];
 
- Dio dio=initDio();
- Response res1;
- var my=['starbucks','Subway','HP','Luckin'];
-var type=['integrate','empty','store','store'];
-
- var numList =['1','2','3','4'];
-
-
-
-
  void initState() {
    //页面初始化
    super.initState();
@@ -63,16 +53,19 @@ var type=['integrate','empty','store','store'];
  }
 
  getList() {
-   Iterable<Widget> listTitles = numList.map((String item) {
+   List<EnterpriseInfo> list = Provider.of<EnterpriseCounter>(context).enterpriseList;
+   Iterable<Widget> listTitles = list.map((EnterpriseInfo item) {
      return new ListTile(
        isThreeLine: true,
        dense: false,
-       leading: new CircleAvatar(child: new Text(item)),
-       title: new Text(my[int.parse(item)-1]),
+       leading: new CircleAvatar(child: new Text(item.enterpriseName[0])),
+       title: new Text(item.enterpriseName),
        subtitle: new Text('Click to see more information'),
        trailing: new Icon(Icons.arrow_right, color: Colors.green),
        onTap: () {
-         Navigator.of(context).popAndPushNamed('/activitys_of_enterprise',arguments:{"Ename":my[int.parse(item)-1], "type":type[int.parse(item)-1],
+         print(item.enterpriseId);
+         Navigator.of(context).pushNamed('/activitys_of_enterprise',arguments:{
+           "EName":item.enterpriseName, "EId": item.enterpriseId
          });
        },
      );
@@ -83,8 +76,6 @@ var type=['integrate','empty','store','store'];
 
  @override
   Widget build(BuildContext context) {
-   print(my);
-   print(type);
     return Scaffold(
       backgroundColor: Colors.white,
       appBar: AppBar(
@@ -113,9 +104,9 @@ var type=['integrate','empty','store','store'];
       body: ListView(
           children:<Widget>[
              Container(
-            width: MediaQuery.of(context).size.width,
-            height: 200.0,
-                child: _swiper),
+                 width: MediaQuery.of(context).size.width,
+                 height: 200.0,
+                 child: _swiper),
 
             SizedBox(height: 30,),
 
