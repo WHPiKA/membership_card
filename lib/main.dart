@@ -78,7 +78,10 @@ class GoWallet extends StatelessWidget {
             "/settings": (_) => SettingsPage(),
             "/search": (_) => SearchPage(),
             "/help": (_) => HelpPage(),
-            "/allCardsMainPage": (_) => AllCardsMainPage(),
+            "/allCardsMainPage": (BuildContext context) {
+              dynamic args = ModalRoute.of(context).settings.arguments;
+              User user=args["user"];
+              return AllCardsMainPage(user);},
             '/allCardsPage': (_) => AllCardsPage(),
             "/loginPage": (_) => LoginPage(),
             "/registerPage": (_) => RegisterPage(),

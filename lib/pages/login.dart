@@ -367,6 +367,7 @@ class LoginPageState extends State<LoginPage> {
                   dioGetEnterprise(dio).then((res1) async{
                     print(res1.statusCode);
                     print(res1.data);
+                    print(jsonDecode(res1.data));
                     if(res1.statusCode==200){
                       List<EnterpriseInfo> list = EnterpriseCounter.fromJson(jsonDecode(res1.data)).enterpriseList;
                       Provider.of<EnterpriseCounter>(context).enterpriseList = list;

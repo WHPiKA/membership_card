@@ -195,7 +195,7 @@ class CouponPageState extends State<CouponPage> with SingleTickerProviderStateMi
                             onPressed: () {
                                 dioUseCoupon(dio, args["card"].cardId, -1).then((res){
                                   if (res.statusCode == 200) {
-                                    args["card"].redeemCoupon();
+                                    args["card"].useCoupon(-1);
                                     Navigator.of(context).popUntil(
                                         ModalRoute.withName(
                                             "/cardinfo_membership"));

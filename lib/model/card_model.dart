@@ -149,14 +149,12 @@ class CardInfo extends ChangeNotifier{
 //    notifyListeners();
 //  }
 
-    void addScore(int score) {
-      if (this._currentScore <= 5)
-        this._currentScore = score;
-      else this._currentScore = 0;
+    void addScore(int surplus) {
+      this._useTimes++;
     }
 
-    void redeemCoupon() {
-      this._couponsNum--;
+    void useCoupon(int i) {
+      this._couponsNum += i;
     }
 
     CardInfo([this._cardId, this._eName]);

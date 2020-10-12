@@ -54,25 +54,12 @@ class ActivityinfoState extends State<ActivityinfoPage> {
       args=ModalRoute.of(context).settings.arguments;
     });
 */    super.initState();
-
-/*
-    dioGetActivity(dio,args['Ename'],args['type']).then((res) async {
-      print(res.statusCode);
-      print(res.data);
-      List<dynamic> js = res.data['activity'];
-      print(js);
-      List<ActivityInfo> mylist = ActivityCounter.fromJson(js).activityList;
-      print(mylist);
-
-      setState(() {
-        my=mylist;
-      });
-    });*/
   }
 
   getList() {
     Iterable<Widget> listTitles;
     int i = 0;
+
     listTitles = my.map((dynamic item) {
       i++;
       print(item);
@@ -80,12 +67,15 @@ class ActivityinfoState extends State<ActivityinfoPage> {
         isThreeLine: true,
         dense: false,
         leading: new CircleAvatar(child: new Text(i.toString())),
-        title: new Text(args['type']),
+        title: new Text(item.type),
         subtitle: new Text(item.description),
         trailing: new Icon(Icons.arrow_right, color: Colors.green),
         onTap: () {
-          Navigator.of(context).popAndPushNamed('/discountDetail',arguments:{"CardType":item.type,"Enterprise":item.enterprise,
-            "Coupons":item.coupons,"Describe":item.description,"ExpireTime":item.expireTime,"TypeId":item.activityId,"BackgroundBase64":item.backgroundbase64
+          Navigator.of(context).pushNamed('/discountDetail',arguments:{
+            "CardType":item.type,"Enterprise":item.enterprise,
+            "Coupons":item.coupons,"Describe":item.description,
+            "ExpireTime":item.expireTime,"id":item.id,
+            "BackgroundBase64":item.backgroundbase64
           });
         },
       );
@@ -97,53 +87,48 @@ class ActivityinfoState extends State<ActivityinfoPage> {
 
   @override
   Widget build(BuildContext context) {
-
     setState(() {
       args=ModalRoute.of(context).settings.arguments;
     });
+
     if(ischanged==false) {
-      dioGetActivity(dio, args['Ename'], args['type']).then((res) async {
+      print(args["EName"]);
+      dioGetEnterpriseActivity(dio, args['EName']).then((res) async {
         print(res.statusCode);
         print(res.data);
-        List<dynamic> js = res.data['activity'];
-        print(js);
-        List<ActivityInfo> mylist = ActivityCounter
+        List<dynamic> js = jsonDecode(res.data);
+        List<ActivityInfo> list = ActivityCounter
             .fromJson(js)
             .activityList;
-        print(mylist);
+        print(list);
 
         setState(() {
-          my = mylist;
+          my = list;
           ischanged=true;
         });
       });
 
-      //根据商家名称获取商家对应的Id, 再根据这个Id用api获取商家背景图base64编码
-      List<EnterpriseInfo> list = Provider.of<EnterpriseCounter>(context).enterpriseList;
       String back_CaptchaCode;
       String dicountCard_CaptchaCode;
-      for(int i = 0; i < list.length; i++){
-        if(list[i].enterpriseName == args["Ename"]){
-
-          String enterpriseId = list[i].enterpriseId;
-
-          dioGetEnterpriseInfo(dio, enterpriseId).then((res) async{
-            print(res.statusCode);
-            print(res.data);
-            if(res.statusCode==200){
-              Map<String, dynamic> js = res.data;
-              back_CaptchaCode = EnterpriseDemo.fromJson(js).base64;
-            }
-          }
-          );
-          break;
+      EnterpriseInfo enterprise;
+      dioGetEnterpriseInfo(dio, args["EId"]).then((res) async{
+        print(res.statusCode);
+        print(res.data);
+        if(res.statusCode==200){
+          Map<String, dynamic> js = jsonDecode(res.data);
+          enterprise = EnterpriseInfo.fromJSON(js);
+          back_CaptchaCode = enterprise.base64;
         }
-      }
 
-      //商家店面背景
-      back_CaptchaCode  = back_CaptchaCode.split(',')[1];
-      bytes = Base64Decoder().convert(back_CaptchaCode);
+        //商家店面背景
+        if (back_CaptchaCode != null) {
+          print(1);
+          back_CaptchaCode = back_CaptchaCode.split(',')[1];
+          bytes = Base64Decoder().convert(back_CaptchaCode);
+        }
+      });
     }
+
     return Scaffold(
       backgroundColor: Colors.white,
       appBar: AppBar(
@@ -174,7 +159,7 @@ class ActivityinfoState extends State<ActivityinfoPage> {
           Container(
               height: MediaQuery.of(context).size.height * 0.37,
               alignment: Alignment(0.5, 0),
-              child: bytes!=null ? Image.memory(bytes, fit: BoxFit.contain,):Image(
+              child: bytes!=null? Image.memory(bytes, fit: BoxFit.contain,):Image(
                 image: AssetImage("assets/backgrounds/starbucksBackground.jpg"),
               )
           ),

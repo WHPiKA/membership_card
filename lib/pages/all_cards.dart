@@ -1,3 +1,4 @@
+import 'dart:convert';
 import 'dart:ui';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
@@ -5,6 +6,7 @@ import 'package:flutter/rendering.dart';
 import 'package:flutter_nfc_reader/flutter_nfc_reader.dart';
 import 'package:membership_card/model/card_count.dart';
 import 'package:membership_card/model/card_model.dart';
+import 'package:membership_card/model/user_model.dart';
 import 'package:membership_card/pages/add_cards_with_camera.dart';
 import 'package:membership_card/pages/add_cards_with_number.dart';
 import 'package:membership_card/pages/card_info_membership.dart';
@@ -28,14 +30,19 @@ import 'package:membership_card/network/client.dart';
 /// cardNumber through bar code, while [AddCardWithNumberPage] needs user to
 /// write the cardNumber on his/her own.
 class AllCardsMainPage extends StatefulWidget {
+  User user;
+  AllCardsMainPage(this.user);
+
   @override
   State<StatefulWidget> createState() {
-    return AllCardsMainPageState();
+    return AllCardsMainPageState(this.user);
   }
 }
 /// This is the state related to the [AllCardsMainPage]
 /// It is the main state of the [AllCardsMainPage]
 class AllCardsMainPageState extends State<AllCardsMainPage> {
+  User user;
+  AllCardsMainPageState(this.user);
   TextEditingController _textEditingController;
   Response res;
   Dio dio = initDio();
@@ -155,36 +162,66 @@ class AllCardsMainPageState extends State<AllCardsMainPage> {
     );
     try {
       response = await FlutterNfcReader.read();
-      print("content: ${response.content} "
-          "status: ${response.status.toString()} "
+      var id = response.content.substring(7);
+      print("id: ${response.id}"
+          "content: $id\n "
+          "status: ${response.status.toString()}\n "
           "error: ${response.error}");
 //      Navigator.of(context).pop();
+      print("OK");
       int index=0;
       int i=0;
-      dioScore(dio,response.content,1).then((res){
-        for( ;i<Provider.of<CardCounter>(context).cardList.length;i++) {
-          if (Provider.of<CardCounter>(context).getOneCard(i).cardId.compareTo(response.content) == 0) {
-            index=i;
-            Provider.of<CardCounter>(context).getOneCard(i).addScore(Provider.of<CardCounter>(context).getOneCard(i).currentScore+1);
-            break;
+      for( ;i < Provider.of<CardCounter>(context).cardList.length;i++) {
+        if (Provider.of<CardCounter>(context).getOneCard(i).typeId.compareTo(int.parse(id)) == 0) {
+          index = i;
+          print(index);
+          break;
+        }
+      }
+      if (i != Provider.of<CardCounter>(context).cardList.length){
+        CardInfo card = Provider.of<CardCounter>(context).getOneCard(index);
+        var cardId = card.cardId;
+        dioScore(dio, cardId, 1).then((res){
+          if (res.statusCode != 200){
+            print(res.statusCode);
+            Navigator.of(context).pop();
+            showDialog(context: context, builder: (_) => _nfcAlertDialog());
           }
-        }
-        if (i==Provider.of<CardCounter>(context).cardList.length){
-          index=Provider.of<CardCounter>(context).cardList.length;
-          Provider.of<CardCounter>(context).addCard(CardInfo(res.data));
-        }
-      });
-      Navigator.of(context).pushNamed("/cardinfo_membership", arguments: {
-        "herotag": Provider.of<CardCounter>(context).getOneCard(index).cardKey,
-        "card": Provider.of<CardCounter>(context).getOneCard(index)
-      });
-      showDialog(context: context, builder: (_) => nfcsuccessDialog(response.content));
+          else{
+            if (card.useTimes % card.discountTimes == card.discountTimes - 1){
+              dioUseCoupon(dio, cardId, 1).then((res){
+                if (res.statusCode == 200) {
+                  Provider.of<CardCounter>(context).getOneCard(index).useCoupon(1);
+                  Provider.of<CardCounter>(context).getOneCard(index).addScore(1);
+                  FlutterNfcReader.stop();
+                  Navigator.of(context).popAndPushNamed("/cardinfo_membership", arguments: {
+                    "herotag": Provider.of<CardCounter>(context).getOneCard(index).cardKey,
+                    "card": Provider.of<CardCounter>(context).getOneCard(index)
+                  });
+                  showDialog(context: context, builder: (_) => nfcSuccessDialog(card.eName));
+                } else {
+                  throw new Exception(res);
+                }
+              });
+            }
+            else{
+              Provider.of<CardCounter>(context).getOneCard(index).addScore(1);
+              FlutterNfcReader.stop();
+              Navigator.of(context).popAndPushNamed("/cardinfo_membership", arguments: {
+                "herotag": Provider.of<CardCounter>(context).getOneCard(index).cardKey,
+                "card": Provider.of<CardCounter>(context).getOneCard(index)
+              });
+              showDialog(context: context, builder: (_) => nfcSuccessDialog(card.eName));
+            }
+          }
+        });
+      }
     } on Exception {
       Navigator.of(context).pop();
       showDialog(context: context, builder: (_) => _nfcAlertDialog());
     }
   }
-  CupertinoAlertDialog nfcsuccessDialog(String name){
+  CupertinoAlertDialog nfcSuccessDialog(String name){
     return CupertinoAlertDialog(
       title:Text("Thank you!",style: TextStyle(color: Colors.blue,fontWeight: FontWeight.w700)),
       content: SizedBox(
